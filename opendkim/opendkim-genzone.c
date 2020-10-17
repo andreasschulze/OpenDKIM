@@ -265,6 +265,9 @@ main(int argc, char **argv)
 	BIO *outbio = NULL;
 	EVP_PKEY *pkey;
 	RSA *rsa;
+#ifdef HAVE_ED25519
+	EC_KEY *ec_key;
+#endif /* HAVE_ED25519 */
 #endif /* USE_GNUTLS */
 	DKIMF_DB db;
 	char keyname[BUFRSZ + 1];
@@ -838,10 +841,19 @@ main(int argc, char **argv)
 		}
 
 		rsa = EVP_PKEY_get1_RSA(pkey);
+#ifdef HAVE_ED25519
+		ec_key = EVP_PKEY_get1_EC_KEY(pkey);
+		if ((rsa == NULL) && (ec_key == NULL))
+#else /* HAVE_ED25519 */
 		if (rsa == NULL)
+#endif /* HAVE_ED25519 */
 		{
 			fprintf(stderr,
+#ifdef HAVE_ED25519
+			        "%s: EVP_PKEY_get1_RSA() and EVP_PKEY_get1_EC_KEY() failed\n",
+#else /* HAVE_ED25519 */
 			        "%s: EVP_PKEY_get1_RSA() failed\n",
+#endif /* HAVE_ED25519 */
 			        progname);
 			(void) dkimf_db_close(db);
 			(void) BIO_free(private);
@@ -852,7 +864,11 @@ main(int argc, char **argv)
 
 		/* convert private to public */
 		status = PEM_write_bio_RSA_PUBKEY(outbio, rsa);
+#ifdef HAVE_ED25519
+		if ((status == 0) && (ec_key == NULL))
+#else /* HAVE_ED25519 */
 		if (status == 0)
+#endif /* HAVE_ED25519 */
 		{
 			fprintf(stderr,
 			        "%s: PEM_write_bio_RSA_PUBKEY() failed\n",
@@ -863,6 +879,23 @@ main(int argc, char **argv)
 			(void) BIO_free(outbio);
 			return 1;
 		}
+#ifdef HAVE_ED25519
+		else
+		{
+			status = PEM_write_bio_EC_PUBKEY(outbio, ec_key);
+			if (status == 0)
+			{
+				fprintf(stderr,
+				        "%s: PEM_write_bio_EC_PUBKEY() failed\n",
+				        progname);
+				(void) dkimf_db_close(db);
+				(void) BIO_free(private);
+				(void) EVP_PKEY_free(pkey);
+				(void) BIO_free(outbio);
+				return 1;
+			}
+		}
+#endif /* HAVE_ED25519 */
 #endif /* USE_GNUTLS */
 
 		/* write the record */
