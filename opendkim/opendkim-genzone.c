@@ -880,7 +880,7 @@ main(int argc, char **argv)
 			return 1;
 		}
 #ifdef HAVE_ED25519
-		else
+		else if (ec_key != NULL)
 		{
 			status = PEM_write_bio_EC_PUBKEY(outbio, ec_key);
 			if (status == 0)
