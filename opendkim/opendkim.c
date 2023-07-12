@@ -13665,13 +13665,16 @@ mlfi_eom(SMFICTX *ctx)
 				int arstat;
 				char *slash;
 
-				/* Microsoft send messages with that AR-Value: "dkim=none (message not signed)"
+				/* Microsoft send messages starting with that AR-Value:
+				 * "dkim=none (message not signed)"
 				 * This happen for every message the author sees. As a result ~50% logging is
 				 * "DKIM verification successful" and also 50% is
 				 * "failed to parse authentication-results: header"
 				 * This code is should simply ignore that garbage...
+				 *
+				 * strlen("dkim=none (message not signed)") = 30
 				 */
-				if (strcasecmp(hdr->hdr_val, "dkim=none (message not signed)") == 0)
+				if (strncasecmp(hdr->hdr_val, "dkim=none (message not signed)", (size_t) 30) == 0)
 				{
 					if (conf->conf_dolog)
 					{
