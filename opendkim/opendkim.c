@@ -13679,12 +13679,22 @@ mlfi_eom(SMFICTX *ctx)
 					if (conf->conf_dolog)
 					{
 						syslog(LOG_WARNING,
-						       "%s: ignore broken %s: header field",
+						       "%s: ignore broken %s:%s header field",
 						       dfc->mctx_jobid,
-						       hdr->hdr_hdr);
+						       hdr->hdr_hdr, hdr->hdr_val);
 					}
 
 					continue;
+				}
+				else
+				{
+					if (conf->conf_dolog)
+					{
+						syslog(LOG_WARNING,
+						       "%s: mismatch %s: %s != 'dkim=none (message not signed)'",
+						       dfc->mctx_jobid,
+						       hdr->hdr_hdr, hdr->hdr_val);
+					}
 				}
 
 				/* remember index */
