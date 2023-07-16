@@ -13672,14 +13672,14 @@ mlfi_eom(SMFICTX *ctx)
 				 * "failed to parse authentication-results: header"
 				 * This code is should simply ignore that garbage...
 				 *
-				 * strlen("dkim=none (message not signed)") = 30
+				 * strlen(" dkim=none (message not signed)") = 31
 				 */
-				if (strncasecmp(hdr->hdr_val, "dkim=none (message not signed)", (size_t) 30) == 0)
+				if (strncasecmp(hdr->hdr_val, " dkim=none (message not signed)", (size_t) 31) == 0)
 				{
 					if (conf->conf_dolog)
 					{
 						syslog(LOG_WARNING,
-						       "%s: ignore broken %s:%s header field",
+						       "%s: ignore broken %s:'%s' header field",
 						       dfc->mctx_jobid,
 						       hdr->hdr_hdr, hdr->hdr_val);
 					}
@@ -13708,7 +13708,7 @@ mlfi_eom(SMFICTX *ctx)
 					if (conf->conf_dolog)
 					{
 						syslog(LOG_WARNING,
-						       "%s: failed to parse %s:%s header field",
+						       "%s: failed to parse %s:'%s' header field",
 						       dfc->mctx_jobid,
 						       hdr->hdr_hdr, hdr->hdr_val);
 					}
