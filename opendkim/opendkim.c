@@ -13665,28 +13665,21 @@ mlfi_eom(SMFICTX *ctx)
 				int arstat;
 				char *slash;
 
-				/* Microsoft send messages starting with that AR-Value:
+				/*
+				 * Microsoft send messages starting with that AR-Value:
 				 * "dkim=none (message not signed)"
 				 * This happen for every message the author sees. As a result ~50% logging is
 				 * "DKIM verification successful" and also 50% is
 				 * "failed to parse authentication-results: header"
-				 * This code is should simply ignore that garbage...
+				 * This code simply ignore that specific header, violating RFC 7601
 				 *
 				 * For simplification this code assume cc->cctx_noleadspc is FALSE
-				 * so a hader line is "name, colon, space, value"
+				 * so a header line is "name, colon, space, value"
 				 *
 				 * strlen(" dkim=none (message not signed)") = 31
 				 */
 				if (strncasecmp(hdr->hdr_val, " dkim=none (message not signed)", (size_t) 31) == 0)
 				{
-					if (conf->conf_dolog)
-					{
-						syslog(LOG_WARNING,
-						       "%s: ignore broken %s:%s header field",
-						       dfc->mctx_jobid,
-						       hdr->hdr_hdr, hdr->hdr_val);
-					}
-
 					continue;
 				}
 
