@@ -5,7 +5,7 @@ check_SCRIPTS = t-sign-ss t-sign-rs t-sign-rs-tables t-sign-rs-tables-bad \
 	t-verify-unsigned t-verify-unsigned-silent \
 	t-verify-syntax t-verify-ss t-verify-ss-header-fields t-verify-ss-bad \
 	t-verify-ss-ar-bad \
-	t-dontsign t-peer \
+	t-dontsign t-maximumheaders t-peer \
 	t-lua-verify-tests t-sign-ss-macro t-sign-ss-macro-value \
 	t-sign-ss-macro-value-file t-verify-report \
 	t-sign-report t-conf-check t-verify-double-from

@@ -4,6 +4,8 @@ This listing shows the versions of the OpenDKIM package, the date of
 release, and a summary of the changes in that release.
 
 2.11.0		2018/11/??
+	Fix issue #143 reject messages exceeding MaximumHeaders with a
+		meaningful response. Patch by A.Schulze
 	Add support for ED25519 keys.  GNUTLS support provided by
 		Dilyan Palauzov.
 	Add "header.s" and "header.a" in generated Authentication-Results
