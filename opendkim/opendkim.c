@@ -11475,11 +11475,23 @@ mlfi_header(SMFICTX *ctx, char *headerf, char *headerv)
 	if (conf->conf_maxhdrsz > 0 &&
 	    dfc->mctx_hdrbytes + strlen(headerf) + strlen(headerv) + 2 > conf->conf_maxhdrsz)
 	{
-		if (conf->conf_dolog)
-			syslog(LOG_NOTICE, "too much header data");
+		char replybuf[BUFRSZ];
 
+		snprintf(replybuf, (size_t)(BUFRSZ - 1), "too much header data: only %u byte are accepted, truncate your headers",
+			(unsigned int) conf->conf_maxhdrsz);
+		if (conf->conf_dolog) {
+			/*
+			** the jobid is retrived in EOM for regular messages
+                        ** so we've to call dkimf_getsymval explicit
+			*/
+			dfc->mctx_jobid = (u_char *) dkimf_getsymval(ctx, "i");
+			syslog(LOG_NOTICE, "%s: %s",
+				JOBID(dfc->mctx_jobid), replybuf);
+		}
+
+		(void) dkimf_setreply(ctx, "550", "5.7.0", replybuf);
 		return dkimf_miltercode(ctx,
-		                        conf->conf_handling.hndl_security,
+		                        DKIMF_MILTER_REJECT,
 		                        NULL);
 	}
 
