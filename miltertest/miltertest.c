@@ -3073,7 +3073,7 @@ mt_eom(lua_State *l)
 	char rcmd;
 	size_t buflen;
 	struct mt_context *ctx;
-	char buf[BUFRSZ];
+	char buf[BUFRSZ * 100];
 
 	assert(l != NULL);
 
